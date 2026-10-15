@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { env } from './env.js';
 
 export const isLiveSupabaseConfigured =
+  env.NODE_ENV !== 'test' &&
   Boolean(env.SUPABASE_URL) &&
   !env.SUPABASE_URL.includes('placeholder') &&
   !env.SUPABASE_URL.includes('your-project-ref') &&

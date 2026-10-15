@@ -1,5 +1,6 @@
 -- ==============================================================================
 -- Intelligent Document Processor: Database Schema & Row-Level Security
+-- (100% Idempotent - Safe to run multiple times in Supabase SQL Editor)
 -- ==============================================================================
 
 -- Enable required extensions
@@ -25,7 +26,8 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace trigger set_profiles_updated_at
+drop trigger if exists set_profiles_updated_at on public.profiles;
+create trigger set_profiles_updated_at
   before update on public.profiles
   for each row execute function public.handle_updated_at();
 
@@ -44,7 +46,8 @@ begin
 end;
 $$ language plpgsql security definer;
 
-create or replace trigger on_auth_user_created
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
@@ -73,7 +76,8 @@ create table if not exists public.documents (
   )
 );
 
-create or replace trigger set_documents_updated_at
+drop trigger if exists set_documents_updated_at on public.documents;
+create trigger set_documents_updated_at
   before update on public.documents
   for each row execute function public.handle_updated_at();
 
@@ -110,7 +114,8 @@ create table if not exists public.document_reviews (
   constraint uq_document_reviewer_field unique (document_id, reviewer_id, field_key)
 );
 
-create or replace trigger set_document_reviews_updated_at
+drop trigger if exists set_document_reviews_updated_at on public.document_reviews;
+create trigger set_document_reviews_updated_at
   before update on public.document_reviews
   for each row execute function public.handle_updated_at();
 
@@ -149,41 +154,48 @@ alter table public.document_extractions enable row level security;
 alter table public.document_reviews enable row level security;
 alter table public.document_tags enable row level security;
 
--- Profiles: Authenticated users can view and update only their own profile
+-- Profiles Policies
+drop policy if exists "Users can view own profile" on public.profiles;
 create policy "Users can view own profile"
   on public.profiles for select
   to authenticated
   using (id = auth.uid());
 
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile"
   on public.profiles for update
   to authenticated
   using (id = auth.uid())
   with check (id = auth.uid());
 
--- Documents: Owner isolation for SELECT, INSERT, UPDATE, DELETE
+-- Documents Policies
+drop policy if exists "Users can view own documents" on public.documents;
 create policy "Users can view own documents"
   on public.documents for select
   to authenticated
   using (owner_id = auth.uid());
 
+drop policy if exists "Users can insert own documents" on public.documents;
 create policy "Users can insert own documents"
   on public.documents for insert
   to authenticated
   with check (owner_id = auth.uid());
 
+drop policy if exists "Users can update own documents" on public.documents;
 create policy "Users can update own documents"
   on public.documents for update
   to authenticated
   using (owner_id = auth.uid())
   with check (owner_id = auth.uid());
 
+drop policy if exists "Users can delete own documents" on public.documents;
 create policy "Users can delete own documents"
   on public.documents for delete
   to authenticated
   using (owner_id = auth.uid());
 
--- Document Extractions: Access permitted only when parent document belongs to auth.uid()
+-- Document Extractions Policies
+drop policy if exists "Users can view own document extractions" on public.document_extractions;
 create policy "Users can view own document extractions"
   on public.document_extractions for select
   to authenticated
@@ -195,6 +207,7 @@ create policy "Users can view own document extractions"
     )
   );
 
+drop policy if exists "Users can insert own document extractions" on public.document_extractions;
 create policy "Users can insert own document extractions"
   on public.document_extractions for insert
   to authenticated
@@ -206,6 +219,7 @@ create policy "Users can insert own document extractions"
     )
   );
 
+drop policy if exists "Users can delete own document extractions" on public.document_extractions;
 create policy "Users can delete own document extractions"
   on public.document_extractions for delete
   to authenticated
@@ -217,7 +231,8 @@ create policy "Users can delete own document extractions"
     )
   );
 
--- Document Reviews: User must own parent document and reviewer must equal auth.uid()
+-- Document Reviews Policies
+drop policy if exists "Users can view reviews on own documents" on public.document_reviews;
 create policy "Users can view reviews on own documents"
   on public.document_reviews for select
   to authenticated
@@ -230,6 +245,7 @@ create policy "Users can view reviews on own documents"
     )
   );
 
+drop policy if exists "Users can insert reviews on own documents" on public.document_reviews;
 create policy "Users can insert reviews on own documents"
   on public.document_reviews for insert
   to authenticated
@@ -242,6 +258,7 @@ create policy "Users can insert reviews on own documents"
     )
   );
 
+drop policy if exists "Users can update reviews on own documents" on public.document_reviews;
 create policy "Users can update reviews on own documents"
   on public.document_reviews for update
   to authenticated
@@ -262,6 +279,7 @@ create policy "Users can update reviews on own documents"
     )
   );
 
+drop policy if exists "Users can delete reviews on own documents" on public.document_reviews;
 create policy "Users can delete reviews on own documents"
   on public.document_reviews for delete
   to authenticated
@@ -274,7 +292,8 @@ create policy "Users can delete reviews on own documents"
     )
   );
 
--- Document Tags: Owner and parent document must match auth.uid()
+-- Document Tags Policies
+drop policy if exists "Users can view tags on own documents" on public.document_tags;
 create policy "Users can view tags on own documents"
   on public.document_tags for select
   to authenticated
@@ -287,6 +306,7 @@ create policy "Users can view tags on own documents"
     )
   );
 
+drop policy if exists "Users can insert tags on own documents" on public.document_tags;
 create policy "Users can insert tags on own documents"
   on public.document_tags for insert
   to authenticated
@@ -299,6 +319,7 @@ create policy "Users can insert tags on own documents"
     )
   );
 
+drop policy if exists "Users can delete tags on own documents" on public.document_tags;
 create policy "Users can delete tags on own documents"
   on public.document_tags for delete
   to authenticated
@@ -310,3 +331,8 @@ create policy "Users can delete tags on own documents"
       and d.owner_id = auth.uid()
     )
   );
+
+-- ------------------------------------------------------------------------------
+-- 8. REFRESH SCHEMA CACHE
+-- ------------------------------------------------------------------------------
+notify pgrst, 'reload schema';

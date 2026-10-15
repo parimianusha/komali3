@@ -92,16 +92,20 @@ export class GeminiExtractionService {
 
     // If client is available with a real API key, call official Gemini SDK
     if (this.client) {
-      return await this.callGeminiApi({
-        userPrompt,
-        category,
-        mimeType,
-        fileBuffer,
-        rawTextContent,
-      });
+      try {
+        return await this.callGeminiApi({
+          userPrompt,
+          category,
+          mimeType,
+          fileBuffer,
+          rawTextContent,
+        });
+      } catch (err: any) {
+        console.warn(`[GeminiExtractionService] Gemini API call failed (${err.message}). Gracefully falling back to local extractor.`);
+      }
     }
 
-    // Heuristic / rule-based fallback for local offline testing when API key is not supplied
+    // Heuristic / rule-based fallback for local offline testing or API outages
     return this.generateLocalFallback({
       category,
       mimeType,
@@ -116,7 +120,7 @@ export class GeminiExtractionService {
     fileBuffer: Buffer;
     rawTextContent?: string | null;
   }) {
-    const modelName = env.GEMINI_MODEL || 'gemini-2.5-flash';
+    const modelName = env.GEMINI_MODEL || 'gemini-3.5-flash';
     let retries = 0;
     const maxRetries = 2;
 

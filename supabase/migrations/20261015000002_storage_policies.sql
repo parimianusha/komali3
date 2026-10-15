@@ -1,5 +1,6 @@
 -- ==============================================================================
 -- Supabase Storage: Private Bucket & Storage RLS Policies
+-- (100% Idempotent - Safe to run multiple times in Supabase SQL Editor)
 -- ==============================================================================
 
 -- Create private bucket for documents if not exists
@@ -19,6 +20,7 @@ on conflict (id) do update set
 -- Storage Object Policies
 -- Only authenticated users can access objects within their own user folder: <owner_id>/<document_id>.<ext>
 
+drop policy if exists "Users can upload their own documents" on storage.objects;
 create policy "Users can upload their own documents"
   on storage.objects for insert
   to authenticated
@@ -27,6 +29,7 @@ create policy "Users can upload their own documents"
     (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "Users can view their own documents" on storage.objects;
 create policy "Users can view their own documents"
   on storage.objects for select
   to authenticated
@@ -35,6 +38,7 @@ create policy "Users can view their own documents"
     (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "Users can update their own documents" on storage.objects;
 create policy "Users can update their own documents"
   on storage.objects for update
   to authenticated
@@ -43,6 +47,7 @@ create policy "Users can update their own documents"
     (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "Users can delete their own documents" on storage.objects;
 create policy "Users can delete their own documents"
   on storage.objects for delete
   to authenticated
