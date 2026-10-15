@@ -19,9 +19,27 @@ app.use(
 );
 
 // CORS Allow-List
+const allowedOrigins = [
+  env.APP_ORIGIN,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+];
+
 app.use(
   cors({
-    origin: [env.APP_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin) return callback(null, true);
+      if (
+        allowedOrigins.includes(requestOrigin) ||
+        requestOrigin.endsWith('.vercel.app') ||
+        requestOrigin.includes('localhost') ||
+        requestOrigin.includes('127.0.0.1')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Mock-User-Id'],
@@ -88,8 +106,8 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(env.PORT, () => {
-    console.log(`[IDP Server] Running on http://localhost:${env.PORT}`);
+  app.listen(env.PORT, '0.0.0.0', () => {
+    console.log(`[IDP Server] Running on http://0.0.0.0:${env.PORT}`);
     console.log(`[IDP Server] Environment: ${env.NODE_ENV}`);
     console.log(`[IDP Server] Gemini Model: ${env.GEMINI_MODEL}`);
     console.log(`[IDP Server] AI Processing: ${env.AI_PROCESSING_ENABLED ? 'ENABLED' : 'DISABLED'}`);
