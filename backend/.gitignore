@@ -1,0 +1,14 @@
+# Backend .gitignore
+.env
+.env.*
+*.env
+!.env.example
+
+node_modules/
+dist/
+coverage/
+*.log
+.storage_local/
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
