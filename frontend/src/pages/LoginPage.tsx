@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FileScan, Lock, Mail, Loader2, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { Sprout, Lock, Mail, Loader2, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { SignInSchema } from '@/shared';
 
 export const LoginPage: React.FC = () => {
-  const { signIn, isDemoMode } = useAuth();
+  const { signIn } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +16,6 @@ export const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Return to safe internal path if redirected
   const from = (location.state as any)?.from?.pathname || '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +39,7 @@ export const LoginPage: React.FC = () => {
       showToast({
         type: 'success',
         title: 'Welcome Back',
-        message: 'Signed in successfully.',
+        message: 'Signed in to AgriSage AI.',
       });
       navigate(from, { replace: true });
     } catch (err: any) {
@@ -51,32 +50,29 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleDemoSignIn = async () => {
-    setEmail('demo.analyst@example.com');
-    setPassword('DemoPassword123!');
     setIsSubmitting(true);
-    await signIn('demo.analyst@example.com', 'DemoPassword123!');
-    setIsSubmitting(false);
+    await signIn('demo.farmer@agrisage.ai', 'DemoPassword123!');
     showToast({
       type: 'success',
       title: 'Demo Access Granted',
-      message: 'Logged in as Demo Analyst.',
+      message: 'Logged in as Demonstration Farmer Partner.',
     });
     navigate(from, { replace: true });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-950 selection:bg-indigo-500/30">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-950 selection:bg-emerald-500/30">
       <div className="w-full max-w-md space-y-8 animate-in fade-in duration-300">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-xl shadow-indigo-600/30 mb-2">
-            <FileScan className="w-7 h-7 text-white" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-green-500 shadow-xl shadow-emerald-600/20 mb-2">
+            <Sprout className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Sign In to IDP Studio
+            Sign In to AgriSage AI
           </h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            Intelligent Document Extraction &amp; Human Verification
+            Intelligent Crop Advisory Assistant &amp; Document Processor
           </p>
         </div>
 
@@ -99,22 +95,22 @@ export const LoginPage: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="analyst@enterprise.com"
+                  placeholder="farmer@agrisage.ai"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Password
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -125,10 +121,10 @@ export const LoginPage: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  placeholder="••••••••••••"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
                 />
               </div>
             </div>
@@ -136,7 +132,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -153,30 +149,28 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Quick Demo Mode Sign In */}
-          {isDemoMode && (
-            <div className="pt-4 border-t border-slate-800">
-              <button
-                type="button"
-                onClick={handleDemoSignIn}
-                disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-indigo-300 bg-indigo-950/60 hover:bg-indigo-950 border border-indigo-500/30 transition-all"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Quick Demo Sign In (1-Click)</span>
-              </button>
-            </div>
-          )}
+          <div className="pt-4 border-t border-slate-800">
+            <button
+              type="button"
+              onClick={handleDemoSignIn}
+              disabled={isSubmitting}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/30 transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Quick Demo Sign In (1-Click for Judges)</span>
+            </button>
+          </div>
 
           <div className="text-center text-xs text-slate-400">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium">
+            <Link to="/signup" className="text-emerald-400 hover:text-emerald-300 font-medium">
               Create account
             </Link>
           </div>
         </div>
 
         <div className="text-center text-[11px] text-slate-600">
-          Private file storage &bull; Row Level Security &bull; Gemini Multi-modal AI
+          Supabase Auth &bull; Multimodal Gemini 3.8 Flash &bull; Open-Meteo Verified Weather
         </div>
       </div>
     </div>

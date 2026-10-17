@@ -14,7 +14,7 @@ const EnvSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).default('placeholder-service-role-key'),
   SUPABASE_STORAGE_BUCKET: z.string().min(1).default('documents'),
   GOOGLE_API_KEY: z.string().optional().default(''),
-  GEMINI_MODEL: z.string().default('gemini-3.5-flash'),
+  GEMINI_MODEL: z.string().default('gemini-3.8-flash'),
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(10 * 1024 * 1024), // 10MB
   MAX_UPLOAD_FILES: z.coerce.number().int().positive().default(10),
   SIGNED_URL_TTL_SECONDS: z.coerce.number().int().positive().default(300), // 5 minutes

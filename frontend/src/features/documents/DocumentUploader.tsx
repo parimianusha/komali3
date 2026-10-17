@@ -16,10 +16,14 @@ import {
   DocumentCategory,
   ALLOWED_MIME_TYPES,
   DEFAULT_MAX_UPLOAD_BYTES,
+  AGRI_DOCUMENT_CATEGORIES,
+  AGRI_DOCUMENT_LABELS,
+  AgriDocumentCategory,
 } from '@/shared';
 import { apiClient } from '../../lib/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface QueuedFile {
   id: string;
@@ -31,12 +35,13 @@ interface QueuedFile {
 export const DocumentUploader: React.FC = () => {
   const { token } = useAuth();
   const { showToast } = useToast();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
-  const [category, setCategory] = useState<DocumentCategory>('invoice');
+  const [category, setCategory] = useState<string>('soil_test_report');
   const [customCategory, setCustomCategory] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [processingInstructions, setProcessingInstructions] = useState('');
@@ -307,17 +312,20 @@ export const DocumentUploader: React.FC = () => {
           </label>
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value as DocumentCategory)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
           >
-            {DOCUMENT_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
+            {AGRI_DOCUMENT_CATEGORIES.map((cat) => {
+              const labelObj = AGRI_DOCUMENT_LABELS[cat];
+              return (
+                <option key={cat} value={cat}>
+                  {labelObj ? labelObj[language] || labelObj.en : cat}
+                </option>
+              );
+            })}
           </select>
           <p className="text-xs text-slate-500 mt-1.5">
-            Guides the AI extraction schema and prioritized business fields.
+            Guides the AI extraction schema for NPK, pH, EC, sum insured, or fertilizer recommendations.
           </p>
 
           {category === 'other' && (

@@ -5,7 +5,11 @@ import {
   DOCUMENT_STATUSES,
   DocumentCategory,
   DocumentStatus,
+  AGRI_DOCUMENT_CATEGORIES,
+  AGRI_DOCUMENT_LABELS,
+  AgriDocumentCategory,
 } from '@/shared';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface DocumentFiltersProps {
   search: string;
@@ -64,14 +68,17 @@ export const DocumentFilters: React.FC<DocumentFiltersProps> = ({
         <select
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
-          className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[180px] truncate"
         >
           <option value="">All Categories</option>
-          {DOCUMENT_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c.charAt(0).toUpperCase() + c.slice(1)}
-            </option>
-          ))}
+          {AGRI_DOCUMENT_CATEGORIES.map((c) => {
+            const labelObj = AGRI_DOCUMENT_LABELS[c];
+            return (
+              <option key={c} value={c}>
+                {labelObj ? labelObj.en : c}
+              </option>
+            );
+          })}
         </select>
 
         {/* Status Filter */}

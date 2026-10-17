@@ -5,6 +5,12 @@ import rateLimit from 'express-rate-limit';
 import { env } from './config/env.js';
 import healthRouter from './routes/health.js';
 import statsRouter from './routes/stats.js';
+import profileRouter from './routes/profile.js';
+import farmsRouter from './routes/farms.js';
+import cropsRouter from './routes/crops.js';
+import advisoryRouter from './routes/advisory.js';
+import weatherRouter from './routes/weather.js';
+import demoRouter from './routes/demo.js';
 import documentsRouter from './routes/documents.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -84,6 +90,12 @@ app.use('/api/v1/documents/:id/process', processingLimiter);
 // Versioned API Routes (/api/v1)
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/stats', statsRouter);
+app.use('/api/v1/profile', profileRouter);
+app.use('/api/v1/farms', farmsRouter);
+app.use('/api/v1/crops', cropsRouter);
+app.use('/api/v1/advisory', advisoryRouter);
+app.use('/api/v1/weather', weatherRouter);
+app.use('/api/v1/demo', demoRouter);
 app.use('/api/v1/documents', documentsRouter);
 
 // Root health convenience
